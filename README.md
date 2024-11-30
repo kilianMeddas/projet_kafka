@@ -87,7 +87,7 @@ docker-compose up
 
 
 ## Useful links
-https://hub.docker.com/r/kmeddas/consumer_api
-https://hub.docker.com/r/kmeddas/producer_api_without_flask
-https://hub.docker.com/r/apache/kafka
-https://hub.docker.com/_/mongo
+* https://hub.docker.com/r/kmeddas/consumer_api
+* https://hub.docker.com/r/kmeddas/producer_api_without_flask
+* https://hub.docker.com/r/apache/kafka
+* https://hub.docker.com/_/mongo
