@@ -1,4 +1,0 @@
-Flask
-pymongo
-kafka-python
-six
