@@ -1,0 +1,21 @@
+plusieurs magasin qui emet des tickets (post) (avec produit, quantité, prix et prix totale) a généré random
+
+APi entrée cloud : reçoit format des tickets.
+A chaque post, annoncé que y'a un ticket de caisse avec kafka broker
+
+autre container avec comsomateur qui fa récupéré les données et mettre dans une base (mangoDB)
+
+2nd API acceder à la base de donnée (via get) 
+
+Front (data app avec streamlit)
+
+container :
+
+1) API random
+2) API entré dans kafka
+3) KAFKA
+4) API consommateur
+5) Container mango DB
+6) API Get 
+7) Streamlit with api get (6)
+
