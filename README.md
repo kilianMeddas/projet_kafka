@@ -30,7 +30,7 @@ This project comprises:
 .
 ├── build_python_mongo
 │   ├── Dockerfile
-│   ├── app.py               # Python script for MongoDB consumer
+│   ├── mangodb.py               # Python script for MongoDB consumer
 │   └── requirements.txt     # Python dependencies
 ├── build_python_producer
 │   ├── Dockerfile
