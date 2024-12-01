@@ -76,6 +76,20 @@ services:
       ME_CONFIG_BASICAUTH_USERNAME: admin  # Nom d'utilisateur pour l'accès
       ME_CONFIG_BASICAUTH_PASSWORD: password  # Mot de passe pour l'accès
 
+  stats_api:
+    image: amina444/venv-stats_api
+    container_name: stats_api
+    networks:
+      - kafka_network
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+    ports:
+      - 8000:8000
+    volumes:
+    - /home/amina/projet_cloud/venv:/app
+
 networks:
   kafka_network:
 
