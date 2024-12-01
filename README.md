@@ -37,6 +37,16 @@ This project comprises:
 │   ├── producer.py          # Python script for Kafka producer
 │   └── requirements.txt     # Python dependencies
 ├── docker-compose.yml       # Docker Compose configuration file
+├── stats
+│   ├── Dockerfile
+│   ├── api_stat.py          # Python script for API statistics
+│   ├── connect.py           # Python script to connect to database (MongoDB)
+│   ├── requirements.txt
+│   ├── statistics.py        # Collect total revenue
+│   ├── statistics2.py       # Collect average revenue
+│   ├── statistics3.py       # Collect revenue by product
+│   ├── statistics4.py       # Collect sales by day and month
+│   └── statistics5.py       # Collect revenue by day and month
 └── README.md
 ```
 ---
