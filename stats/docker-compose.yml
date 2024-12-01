@@ -1,0 +1,97 @@
+services:
+  broker:
+    image: apache/kafka:latest
+    container_name: broker
+    networks:
+      - kafka_network
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://broker:9092,CONTROLLER://broker:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+  
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    networks:
+      - kafka_network
+    ports:
+      - 9000:9000
+    environment:
+      KAFKA_BROKERCONNECT: broker:9092
+    depends_on:
+    - broker
+
+  mongo:
+    image: mongo
+    container_name: mongo
+    networks:
+      - kafka_network
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - mango_data:/data/db
+  
+  mongodb_python:
+    image: kmeddas/consumer_api
+    networks:
+      - kafka_network
+    container_name: mongodb_python
+    depends_on:
+     - mongo
+     - broker
+    ports:
+      - 5050:5050
+  
+  producer:
+    image: kmeddas/producer_api_without_flask
+    container_name: producer
+    networks:
+      - kafka_network
+    depends_on:
+     - broker
+    ports:
+      - 5000:5000
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express
+    networks:
+      - kafka_network
+    ports:
+      - 8081:8081
+    depends_on:
+      - mongo
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo  # Le nom du service MongoDB
+      ME_CONFIG_BASICAUTH_USERNAME: admin  # Nom d'utilisateur pour l'accès
+      ME_CONFIG_BASICAUTH_PASSWORD: password  # Mot de passe pour l'accès
+
+  stats_api:
+    image: amina444/venv-stats_api
+    container_name: stats_api
+    networks:
+      - kafka_network
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+    ports:
+      - 8000:8000
+    volumes:
+    - /home/amina/projet_cloud/venv:/app
+
+networks:
+  kafka_network:
+
+volumes:
+  mango_data:
