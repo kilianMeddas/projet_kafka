@@ -12,9 +12,9 @@ def get_all_stats():
     try:
         revenue = collect_total_revenue()  # Get total revenue
         average = collect_average_revenue()  # Get average revenue
-        revenue_by_product = collect_revenue_by_product() #Get revenue by product
-        sales = collect_sales_by_day_and_month() #get the sales by day and month
-        revenue_dM = revenue_day_month()
+        revenue_by_product = collect_revenue_by_product() # Get revenue by product
+        sales = collect_sales_by_day_and_month() # Get the sales by day and month
+        revenue_dM = revenue_day_month() # Get revenue by day and month
         stats = {
             "total revenue": revenue,
             "average revenue": average,
