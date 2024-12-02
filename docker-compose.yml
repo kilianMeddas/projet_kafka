@@ -65,7 +65,7 @@ services:
       - stat_data:/data
 
   interface:
-    image: kmeddas/test
+    image: kmeddas/interface_cloud
     container_name: interface
     networks:
       - kafka_network
