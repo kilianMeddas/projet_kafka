@@ -5,64 +5,50 @@ import requests
 from datetime import datetime
 import base64
 import random
-from streamlit_autorefresh import st_autorefresh  # Importer st_autorefresh
+from streamlit_autorefresh import st_autorefresh
 
-# Configuration de la page
 st.set_page_config(page_title="Dashboard de Noël", layout="wide")
 
-# Rafraîchissement automatique toutes les 10 secondes (10000 millisecondes)
-count = st_autorefresh(interval=10000, limit=None, key="datarefresh")
+if "page" not in st.session_state:
+    st.session_state.page = "intro"
 
-# Fonction pour récupérer les données depuis l'API (sans mise en cache)
+if st.session_state.page == "dashboard":
+    count = st_autorefresh(interval=1000, limit=None, key="datarefresh")
+
+@st.cache_data
 def get_data_from_api():
     response = requests.get("http://stats_api:8000/stats")# URL de l'API
-    data = response.json()
-    return data
+    return response.json()
 
-# Charger les données
 api_data = get_data_from_api()
 
-# Préparer les données
-total_revenue = api_data["total revenue"]
-average_revenue = api_data["average revenue"]
+total_revenue = api_data.get("total revenue", 0)
+average_revenue = api_data.get("average revenue", 0)
 
-# Revenu par produit
 revenue_by_product_df = pd.DataFrame(
-    list(api_data["revenue by product"].items()),
+    list(api_data.get("revenue by product", {}).items()),
     columns=["Produit", "Revenu (€)"]
-)
+).sort_values(by="Revenu (€)", ascending=False).reset_index(drop=True)
 
-# Ventes par jour
-sales_by_day_data = api_data["sales by day and month"][0]  # Premier élément est 'by day'
-sales_by_day_df = pd.DataFrame(
-    list(sales_by_day_data.items()),
-    columns=["Date", "Nombre de Ventes"]
-)
-sales_by_day_df["Date"] = pd.to_datetime(sales_by_day_df["Date"])
+if not revenue_by_product_df.empty:
+    revenue_by_product_df["% du Revenu Total"] = (
+        revenue_by_product_df["Revenu (€)"] / total_revenue * 100
+    )
 
-# Revenu par jour
-revenue_by_day_data = api_data["revenue by day and month"]["by day"]
-revenue_by_day_df = pd.DataFrame(
-    list(revenue_by_day_data.items()),
-    columns=["Date", "Revenu (€)"]
-)
-revenue_by_day_df["Date"] = pd.to_datetime(revenue_by_day_df["Date"])
+noel_colors = [
+    "#FF0000", "#FF4500", "#FFD700", "#ADFF2F", "#32CD32", "#006400",
+    "#008000", "#7CFC00", "#FFFF00", "#FF6347"
+]
+revenue_by_product_df["Couleur"] = noel_colors[:len(revenue_by_product_df)]
 
-# Fonction pour charger l'image et la convertir en base64
 def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
         encoded = base64.b64encode(img_file.read()).decode()
     return encoded
 
-# Gestion de l'état pour basculer entre les pages
-if "page" not in st.session_state:
-    st.session_state.page = "intro"
-
-# **Page d'introduction festive**
 if st.session_state.page == "intro":
-    image_base64 = get_base64_image("noelbd.jpg")  # Assurez-vous que le chemin est correct
+    image_base64 = get_base64_image("noelbd.jpg")
 
-    # Générer le CSS pour les flocons de neige avec des propriétés aléatoires
     snowflake_css = ''
     for i in range(1, 51):
         left = random.randint(0, 100)
@@ -80,11 +66,9 @@ if st.session_state.page == "intro":
         }}
         '''
 
-    # CSS et HTML pour l'effet de Noël
     st.markdown(
         f"""
         <style>
-        /* Fond d'écran */
         .stApp {{
             background-image: url("data:image/jpg;base64,{image_base64}");
             background-size: cover;
@@ -94,7 +78,6 @@ if st.session_state.page == "intro":
             overflow: hidden;
         }}
 
-        /* Flocons de neige */
         .snowflakes {{
             position: fixed;
             top: 0;
@@ -123,10 +106,8 @@ if st.session_state.page == "intro":
             }}
         }}
 
-        /* Ajouter le CSS des flocons avec des propriétés aléatoires */
         {snowflake_css}
 
-        /* Centrer le contenu */
         .container {{
             display: flex;
             flex-direction: column;
@@ -152,7 +133,6 @@ if st.session_state.page == "intro":
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
         }}
 
-        /* Bouton stylé */
         .stButton > button {{
             background-color: #FF4500;
             border: none;
@@ -169,7 +149,6 @@ if st.session_state.page == "intro":
             transform: scale(1.05);
         }}
 
-        /* Centrer le bouton */
         .stButton {{
             text-align: center;
         }}
@@ -177,16 +156,13 @@ if st.session_state.page == "intro":
         """, unsafe_allow_html=True
     )
 
-    # Générer le HTML des flocons de neige
     snowflakes_html = '<div class="snowflakes" aria-hidden="true">'
     for _ in range(50):
         snowflakes_html += '<div class="snowflake">❄</div>'
     snowflakes_html += '</div>'
 
-    # Afficher les flocons de neige
     st.markdown(snowflakes_html, unsafe_allow_html=True)
 
-    # HTML pour le contenu
     st.markdown(
         """
         <div class="container">
@@ -197,145 +173,146 @@ if st.session_state.page == "intro":
         unsafe_allow_html=True
     )
 
-    # Bouton pour accéder au Dashboard
     if st.button("Accéder au Dashboard"):
         st.session_state.page = "dashboard"
         st.experimental_rerun()
 
-# **Dashboard principal**
 elif st.session_state.page == "dashboard":
-    # Titre
     st.title("🎄 Dashboard des Ventes de Noël 🎄")
 
-    # CSS pour personnaliser le dashboard
     st.markdown(
         """
         <style>
-        /* Couleur de fond du dashboard */
-        .stApp {
+        .stApp {{
             background-color: #FDF6E3;
             color: #333333;
-        }
+        }}
 
-        /* Titre principal */
-        h1 {
-            color: #B22222; /* Rouge bordeaux */
-        }
+        h1 {{
+            color: #B22222;
+        }}
 
-        /* Sous-titres */
-        h2, h3 {
-            color: #006400; /* Vert sapin */
-        }
+        h2, h3 {{
+            color: #006400;
+        }}
 
-        /* Texte */
-        p {
+        p {{
             color: #333333;
-        }
+        }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
-    # Statistiques clés
     st.header("Statistiques Clés")
     col1, col2 = st.columns(2)
-    col1.metric("Revenu Total (€)", f"{total_revenue:,.2f}", delta_color="off")
-    col2.metric("Revenu Moyen (€)", f"{average_revenue:,.2f}", delta_color="off")
+    col1.metric("Revenu Total (€)", f"{total_revenue:,.0f} €", delta_color="off")
+    col2.metric("Revenu Moyen (€)", f"{average_revenue:,.0f} €", delta_color="off")
 
-    # Graphique 1 : Revenu par produit (barres rouges)
-    st.subheader("🎁 Revenu par Produit")
-    bars = alt.Chart(revenue_by_product_df).mark_bar().encode(
-        x=alt.X("Revenu (€):Q", title="Revenu (€)"),
-        y=alt.Y("Produit:N", sort='-x', title="Produit"),
-        color=alt.value("#B22222"),  # Rouge bordeaux
-        tooltip=["Produit:N", "Revenu (€):Q"]
-    )
-    text = bars.mark_text(
-        align='left',
-        baseline='middle',
-        dx=5,  # Décalage horizontal
-        fontSize=12,
-        color='black'
-    ).encode(
-        text=alt.Text("Revenu (€):Q", format=",.0f")
-    )
-    chart1 = (bars + text).properties(
-        height=400,
-        width=700
-    )
-    st.altair_chart(chart1, use_container_width=True)
+    st.sidebar.title("🌺 Légende des Produits")
+    for product, color in zip(revenue_by_product_df["Produit"], revenue_by_product_df["Couleur"]):
+        st.sidebar.markdown(f"<span style='color:{color};'>■</span> {product}", unsafe_allow_html=True)
 
-    # Graphique 2 : Répartition du revenu par produit (camembert)
-    st.subheader("🧁 Répartition du Revenu par Produit")
-    noel_colors = ["#B22222", "#006400", "#FFD700", "#8B0000", "#228B22", "#FFA500", "#FF6347", "#2E8B57", "#CD5C5C", "#ADFF2F"]
-    chart2 = alt.Chart(revenue_by_product_df).mark_arc(innerRadius=50).encode(
-        theta=alt.Theta("Revenu (€):Q", stack=True),
-        color=alt.Color("Produit:N", scale=alt.Scale(domain=revenue_by_product_df["Produit"], range=noel_colors), legend=None),
-        tooltip=["Produit:N", "Revenu (€):Q"]
-    ).properties(
-        height=400,
-        width=400
-    )
-    st.altair_chart(chart2, use_container_width=True)
-
-    # Ajouter une légende visuelle
-    st.markdown("#### Légende des Produits")
-    legend_html = "<div style='display: flex; flex-wrap: wrap; gap: 10px;'>"
-    for product, color in zip(revenue_by_product_df["Produit"], noel_colors):
-        legend_html += f"<div style='display: flex; align-items: center; gap: 5px;'>"
-        legend_html += f"<div style='width: 20px; height: 20px; background-color: {color}; border-radius: 50%;'></div>"
-        legend_html += f"<span>{product}</span>"
-        legend_html += "</div>"
-    legend_html += "</div>"
-    st.markdown(legend_html, unsafe_allow_html=True)
-
-    # Graphique 3 : Revenu par jour (ligne)
-    st.subheader("📅 Revenu par Jour")
-    if not revenue_by_day_df.empty:
-        chart3 = alt.Chart(revenue_by_day_df).mark_line(point=True).encode(
-            x=alt.X("Date:T", title="Date"),
-            y=alt.Y("Revenu (€):Q", title="Revenu (€)"),
-            color=alt.value("#006400"),  # Vert sapin
-            tooltip=["Date:T", "Revenu (€):Q"]
+    if not revenue_by_product_df.empty:
+        st.subheader("🎁 Revenu par Produit")
+        chart1 = alt.Chart(revenue_by_product_df).mark_bar().encode(
+            x=alt.X("Revenu (€):Q", title="Revenu (€)"),
+            y=alt.Y("Produit:N", sort=alt.EncodingSortField(field='Revenu (€)', order='descending'), title="Produit"),
+            color=alt.Color("Couleur:N", scale=None),
+            tooltip=["Produit:N", "Revenu (€):Q"]
         ).properties(
             height=400
         )
-        st.altair_chart(chart3, use_container_width=True)
-    else:
-        st.info("Données insuffisantes pour afficher le revenu par jour.")
 
-    # Graphique 4 : Nombre de ventes par jour (barres)
-    st.subheader("📈 Nombre de Ventes par Jour")
-    if not sales_by_day_df.empty:
-        chart4 = alt.Chart(sales_by_day_df).mark_bar().encode(
-            x=alt.X("Date:T", title="Date"),
-            y=alt.Y("Nombre de Ventes:Q", title="Nombre de Ventes"),
-            color=alt.value("#DAA520"),  # Doré
-            tooltip=["Date:T", "Nombre de Ventes:Q"]
+        text_chart1 = alt.Chart(revenue_by_product_df).mark_text(align='left', dx=3).encode(
+            x=alt.X("Revenu (€):Q"),
+            y=alt.Y("Produit:N"),
+            text=alt.Text("Revenu (€):Q", format="# ##0 €")
+        )
+
+        chart1_combined = chart1 + text_chart1
+        st.altair_chart(chart1_combined, use_container_width=True)
+
+        st.subheader("📊 Contribution de chaque Produit au Revenu Total (%)")
+        chart2_updated = alt.Chart(revenue_by_product_df).mark_bar().encode(
+            x=alt.X("Produit:N", sort="-y", title="Produit", axis=alt.Axis(labelAngle=-90)),
+            y=alt.Y("% du Revenu Total:Q", title="% du Revenu Total"),
+            color=alt.Color("% du Revenu Total:Q", scale=alt.Scale(domain=[revenue_by_product_df["% du Revenu Total"].min(), revenue_by_product_df["% du Revenu Total"].max()], range=['red', 'yellow', 'green'])),
+            tooltip=["Produit:N", "% du Revenu Total:Q"]
         ).properties(
             height=400
         )
-        st.altair_chart(chart4, use_container_width=True)
+
+        text = alt.Chart(revenue_by_product_df).mark_text(dy=-10, color='black').encode(
+            x=alt.X("Produit:N", sort="-y"),
+            y=alt.Y("% du Revenu Total:Q"),
+            text=alt.Text("% du Revenu Total:Q", format="0.2f%%")
+        )
+
+        chart2_combined = chart2_updated + text
+        st.altair_chart(chart2_combined, use_container_width=True)
+
+    st.subheader("🍰 Répartition des Revenus par Catégorie")
+    categories = {
+        "Décorations": ["Boules de Noël", "Guirlandes lumineuses", "Ornements de table", "Sapins de Noël"],
+        "Accessoires Festifs": ["Chaussettes de Noël", "Tasses festives"],
+        "Cadeaux et Emballages": ["Bougies parfumées", "Calendriers de l'Avent", "Peluches de Noël", "Papiers cadeaux"]
+    }
+
+    revenue_by_category = {}
+    for category, products in categories.items():
+        revenue_by_category[category] = revenue_by_product_df[revenue_by_product_df["Produit"].isin(products)]["Revenu (€)"].sum()
+
+    revenue_by_category_df = pd.DataFrame(list(revenue_by_category.items()), columns=["Catégorie", "Revenu (€)"])
+    revenue_by_category_df["Produits Inclus"] = revenue_by_category_df["Catégorie"].apply(lambda x: ', '.join(categories[x]))
+
+    if not revenue_by_category_df.empty:
+        christmas_pie_colors = ["#FFB6C1", "#FF69B4", "#8B0000"]  # Adding new Christmas-themed colors
+
+        venn_chart = alt.Chart(revenue_by_category_df).mark_arc(innerRadius=50).encode(
+            theta=alt.Theta(field="Revenu (€)", type="quantitative"),
+            color=alt.Color(field="Catégorie", type="nominal", scale=alt.Scale(range=christmas_pie_colors)),
+            tooltip=["Catégorie:N", "Revenu (€):Q", "Produits Inclus:N"]
+        ).properties(
+            height=400
+        )
+
+        st.altair_chart(venn_chart, use_container_width=True)
+
+    st.subheader("🗓️ Revenus et Ventes par Jour")
+    revenue_by_day = api_data.get("revenue by day and month", {}).get("by day", {})
+    sales_by_day = api_data.get("sales by day and month", [])[0]
+
+    if revenue_by_day and sales_by_day:
+        daily_sales_df = pd.DataFrame(
+            [{"Date": date, "Revenu (€)": revenue, "Ventes": sales_by_day.get(date, 0)} for date, revenue in revenue_by_day.items()]
+        )
+        daily_sales_df["Date"] = pd.to_datetime(daily_sales_df["Date"])
+
+        if not daily_sales_df.empty:
+            daily_revenue_chart = alt.Chart(daily_sales_df).mark_bar().encode(
+                x=alt.X("Date:T", title="Date"),
+                y=alt.Y("Revenu (€):Q", title="Revenu (€)"),
+                color=alt.value("#FF4500"),
+                tooltip=["Date:T", "Revenu (€):Q"]
+            ).properties(
+                height=400
+            )
+
+            daily_sales_chart = alt.Chart(daily_sales_df).mark_bar().encode(
+                x=alt.X("Date:T", title="Date"),
+                y=alt.Y("Ventes:Q", title="Ventes"),
+                color=alt.value("#1E90FF"),
+                tooltip=["Date:T", "Ventes:Q"]
+            ).properties(
+                height=400
+            )
+
+            st.altair_chart(daily_revenue_chart, use_container_width=True)
+            st.altair_chart(daily_sales_chart, use_container_width=True)
     else:
-        st.info("Données insuffisantes pour afficher le nombre de ventes par jour.")
+        st.warning("Les données de ventes journalières ne sont pas disponibles, impossible de générer les graphiques.")
 
-    # Graphique 5 : Revenu moyen par vente
-    st.subheader("💰 Revenu Moyen par Vente")
-    average_revenue_df = pd.DataFrame({
-        "Type": ["Revenu Moyen"],
-        "Revenu (€)": [average_revenue]
-    })
-    chart5 = alt.Chart(average_revenue_df).mark_bar().encode(
-        x=alt.X("Type:N", title=""),
-        y=alt.Y("Revenu (€):Q", title="Revenu (€)"),
-        color=alt.value("#B22222"),  # Rouge bordeaux
-        tooltip=["Revenu (€):Q"]
-    ).properties(
-        height=200
-    )
-    st.altair_chart(chart5, use_container_width=True)
-
-    # Bouton pour revenir à la page d'intro
     if st.sidebar.button("⬅️ Retour à l'accueil"):
         st.session_state.page = "intro"
         st.experimental_rerun()
