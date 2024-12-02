@@ -3,6 +3,11 @@ FROM python:3.9-slim
 # Copier les fichiers de mon app
 COPY requirements.txt .
 COPY api_stat.py .
+COPY statistics.py .
+COPY statistics2.py .
+COPY statistics3.py .
+COPY statistics4.py .
+COPY statistics5.py .
 
 # Installer les dépendances
 RUN pip install -r requirements.txt
