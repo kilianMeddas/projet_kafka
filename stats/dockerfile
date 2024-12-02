@@ -10,7 +10,7 @@ RUN pip install -r requirements.txt
 # Installer Gunicorn
 RUN pip install gunicorn
 
-# Lancer Gunicorn avec votre application Flask
+# Lancer Gunicorn avec  application Flask
 CMD ["gunicorn", "-b", "0.0.0.0:8000", "api_stat:app"]
 
 
