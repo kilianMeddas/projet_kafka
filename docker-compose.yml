@@ -77,7 +77,7 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: password  # Mot de passe pour l'accès
 
   stats_api:
-    image: amina444/venv-stats_api
+    image: kmeddas/api_stat
     container_name: stats_api
     networks:
       - kafka_network

@@ -1,8 +1,9 @@
-FROM python:3.9-slim
+FROM python:3.11
 
 # Copier les fichiers de mon app
 COPY requirements.txt .
 COPY api_stat.py .
+COPY connect.py .
 COPY statistics.py .
 COPY statistics2.py .
 COPY statistics3.py .
