@@ -24,6 +24,10 @@ This project comprises:
 
 ---
 
+## Architecture du projet
+![alt text](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
+
+---
 ## Project Structure
 
 ```plaintext
@@ -101,3 +105,4 @@ docker-compose up
 * https://hub.docker.com/r/kmeddas/producer_api_without_flask
 * https://hub.docker.com/r/apache/kafka
 * https://hub.docker.com/_/mongo
+
