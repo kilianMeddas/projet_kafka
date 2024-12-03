@@ -25,7 +25,8 @@ This project comprises:
 ---
 
 ## Architecture du projet
-![alt text](https://github.com/[kmeddas]/[projet_kafka]/blob/[main]/Architecture.jpg?raw=true)
+![Architecture](Architecture.jpg)
+
 
 ---
 ## Project Structure
