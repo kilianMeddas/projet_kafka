@@ -1,3 +1,4 @@
+# Importing necessary libraries
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -7,48 +8,64 @@ import base64
 import random
 from streamlit_autorefresh import st_autorefresh
 
+# Initial configuration of the Streamlit page
 st.set_page_config(page_title="Dashboard de Noël", layout="wide")
 
+# Initialize the page state if not already set
 if "page" not in st.session_state:
     st.session_state.page = "intro"
 
+# Auto-refresh for the dashboard page
 if st.session_state.page == "dashboard":
     count = st_autorefresh(interval=1000, limit=None, key="datarefresh")
 
-@st.cache_data
+# Caching API data retrieval with a time-to-live (TTL) of 10 seconds
+# Refresh every 10 secondes
+@st.cache_data(ttl=10)
 def get_data_from_api():
     response = requests.get("http://stats_api:8000/stats")# URL de l'API
     return response.json()
 
+# Fetching API data
 api_data = get_data_from_api()
 
+# Extracting data from API
 total_revenue = api_data.get("total revenue", 0)
 average_revenue = api_data.get("average revenue", 0)
 
+# Preparing a DataFrame for product revenue analysis
 revenue_by_product_df = pd.DataFrame(
     list(api_data.get("revenue by product", {}).items()),
     columns=["Produit", "Revenu (€)"]
 ).sort_values(by="Revenu (€)", ascending=False).reset_index(drop=True)
 
+# Adding a percentage of total revenue if the DataFrame is not empty
 if not revenue_by_product_df.empty:
     revenue_by_product_df["% du Revenu Total"] = (
         revenue_by_product_df["Revenu (€)"] / total_revenue * 100
     )
 
+# Assigning Christmas themed colors to products
 noel_colors = [
     "#FF0000", "#FF4500", "#FFD700", "#ADFF2F", "#32CD32", "#006400",
     "#008000", "#7CFC00", "#FFFF00", "#FF6347"
 ]
+
 revenue_by_product_df["Couleur"] = noel_colors[:len(revenue_by_product_df)]
 
+
+# Function to encode an image in base64 format
 def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
         encoded = base64.b64encode(img_file.read()).decode()
     return encoded
 
+
 if st.session_state.page == "intro":
+    # Encoding the background image
     image_base64 = get_base64_image("noelbd.jpg")
 
+    # Generating CSS for falling snowflakes animation
     snowflake_css = ''
     for i in range(1, 51):
         left = random.randint(0, 100)
@@ -66,6 +83,7 @@ if st.session_state.page == "intro":
         }}
         '''
 
+    # Applying styles to the intro page
     st.markdown(
         f"""
         <style>
@@ -156,6 +174,7 @@ if st.session_state.page == "intro":
         """, unsafe_allow_html=True
     )
 
+    # Generating snowflake HTML
     snowflakes_html = '<div class="snowflakes" aria-hidden="true">'
     for _ in range(50):
         snowflakes_html += '<div class="snowflake">❄</div>'
@@ -163,6 +182,8 @@ if st.session_state.page == "intro":
 
     st.markdown(snowflakes_html, unsafe_allow_html=True)
 
+
+    # Adding welcome message and button to switch to the dashboard
     st.markdown(
         """
         <div class="container">
@@ -173,6 +194,7 @@ if st.session_state.page == "intro":
         unsafe_allow_html=True
     )
 
+    # Button to navigate to the dashboard
     if st.button("Accéder au Dashboard"):
         st.session_state.page = "dashboard"
         st.experimental_rerun()
@@ -180,6 +202,7 @@ if st.session_state.page == "intro":
 elif st.session_state.page == "dashboard":
     st.title("🎄 Dashboard des Ventes de Noël 🎄")
 
+    # Applying styles to the dashboard page
     st.markdown(
         """
         <style>
@@ -204,17 +227,25 @@ elif st.session_state.page == "dashboard":
         unsafe_allow_html=True
     )
 
+    # Displaying main informations
     st.header("Statistiques Clés")
     col1, col2 = st.columns(2)
     col1.metric("Revenu Total (€)", f"{total_revenue:,.0f} €", delta_color="off")
     col2.metric("Revenu Moyen (€)", f"{average_revenue:,.0f} €", delta_color="off")
 
+    # Sidebar legend for products with their associated colors
     st.sidebar.title("🌺 Légende des Produits")
     for product, color in zip(revenue_by_product_df["Produit"], revenue_by_product_df["Couleur"]):
+        # Display each product with its corresponding color in the sidebar
         st.sidebar.markdown(f"<span style='color:{color};'>■</span> {product}", unsafe_allow_html=True)
 
+    # Check if the DataFrame for product revenue is not empty
     if not revenue_by_product_df.empty:
+ 
+        # Subheader for revenue by product chart
         st.subheader("🎁 Revenu par Produit")
+
+        # Create different chart using Altair
         chart1 = alt.Chart(revenue_by_product_df).mark_bar().encode(
             x=alt.X("Revenu (€):Q", title="Revenu (€)"),
             y=alt.Y("Produit:N", sort=alt.EncodingSortField(field='Revenu (€)', order='descending'), title="Produit"),
@@ -311,6 +342,7 @@ elif st.session_state.page == "dashboard":
             st.altair_chart(daily_revenue_chart, use_container_width=True)
             st.altair_chart(daily_sales_chart, use_container_width=True)
     else:
+        # Warning message if no daily data is available
         st.warning("Les données de ventes journalières ne sont pas disponibles, impossible de générer les graphiques.")
 
     if st.sidebar.button("⬅️ Retour à l'accueil"):

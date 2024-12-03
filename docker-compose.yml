@@ -24,8 +24,6 @@ services:
     networks:
       - kafka_network
     restart: always
-    ports:
-      - 27017:27017
     volumes:
       - mango_data:/data/db
 
@@ -37,8 +35,6 @@ services:
     depends_on:
       - mongo
       - broker
-    ports:
-      - 5050:5050
 
   producer:
     image: kmeddas/producer_api_without_flask
@@ -47,8 +43,6 @@ services:
       - kafka_network
     depends_on:
       - broker
-    ports:
-      - 5000:5000
 
   stats_api:
     image: kmeddas/api_stat
