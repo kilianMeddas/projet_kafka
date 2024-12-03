@@ -4,6 +4,7 @@ This project demonstrates how to integrate Kafka and MongoDB using Docker. The s
 
 ## Table of Contents
 - [Overview](#overview)
+- [Architecture du projet](#architecture-du-projet)
 - [Project Structure](#project-structure)
 - [Technologies Used](#technologies-used)
 - [Setup and Installation](#setup-and-installation)
@@ -11,7 +12,6 @@ This project demonstrates how to integrate Kafka and MongoDB using Docker. The s
 - [Usage](#usage)
 - [Contributors](#contributors)
 - [Useful links](#useful-links)
-- [Architecture du projet](#architecture_du_projet)
 ---
 
 ## Overview
@@ -41,7 +41,6 @@ This project comprises:
 │   ├── Dockerfile
 │   ├── producer.py          # Python script for Kafka producer
 │   └── requirements.txt     # Python dependencies
-├── docker-compose.yml       # Docker Compose configuration file
 ├── stats
 │   ├── Dockerfile
 │   ├── api_stat.py          # Python script for API statistics
@@ -52,6 +51,13 @@ This project comprises:
 │   ├── statistics3.py       # Collect revenue by product
 │   ├── statistics4.py       # Collect sales by day and month
 │   └── statistics5.py       # Collect revenue by day and month
+├── interface
+│   ├── Dockerfile
+│   ├── app.py          # Python script for interface
+│   ├── noelbd.jpg      # image for interface
+│   ├── requierement.txt
+├──Architecture.jpg
+├── docker-compose.yml       # Docker Compose configuration file
 └── README.md
 ```
 ---
@@ -60,9 +66,9 @@ This project comprises:
 * Docker: For containerizing services.
 * Kafka: As the message broker.
 * MongoDB: For storing consumed messages.
-* Kafdrop: Kafka monitoring tool.
-* Mongo-Express: Web-based MongoDB administration tool.
 * Python: For the producer and consumer scripts.
+* Streamlit : For the interface
+* Flask : To check the stat file
 
 ---
 ## Setup and Installation
@@ -95,10 +101,8 @@ docker-compose up
 ```
 
 4) Access the services:
-* Kafdrop: http://localhost:9000
-* Mongo-Express: http://localhost:8081
-* Producer API: http://localhost:5000
 * Consumer API: http://localhost:5050
+* Interface : http://localhost:8501
 
 
 ## Useful links
