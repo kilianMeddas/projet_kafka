@@ -111,7 +111,7 @@ or
 docker-compose down
 ```
 4) Access the services:
-* Check stat: http://localhost:8000/stats   :warning: interface could bug :warning:
+* Check stat: http://localhost:8000/stats   :warning: interface could bug if you look at this :warning:
 * User interface : http://localhost:8501
 
 You can add kafdrop and mango-express to have an user-friendly interface to check more deeply
