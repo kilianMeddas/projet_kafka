@@ -8,10 +8,9 @@ This project demonstrates how to integrate Kafka and MongoDB using Docker. The s
 - [Project Structure](#project-structure)
 - [Technologies Used](#technologies-used)
 - [Setup and Installation](#setup-and-installation)
-- [Services Description](#services-description)
-- [Usage](#usage)
-- [Contributors](#contributors)
 - [Useful links](#useful-links)
+- [Contributors](#contributors)
+
 ---
 
 ## Overview
@@ -36,11 +35,16 @@ This project comprises:
 ├── build_python_mongo
 │   ├── Dockerfile
 │   ├── mangodb.py               # Python script for MongoDB consumer
-│   └── requirements.txt     # Python dependencies
+│   └── requirement.txt     # Python dependencies
 ├── build_python_producer
 │   ├── Dockerfile
 │   ├── producer.py          # Python script for Kafka producer
-│   └── requirements.txt     # Python dependencies
+│   └── requirement.txt     # Python dependencies
+├── interface
+│   ├── Dockerfile
+│   ├── app.py          # Python script for interface
+│   ├── noelbd.jpg      # image for interface
+│   ├── requierement.txt
 ├── stats
 │   ├── Dockerfile
 │   ├── api_stat.py          # Python script for API statistics
@@ -51,14 +55,10 @@ This project comprises:
 │   ├── statistics3.py       # Collect revenue by product
 │   ├── statistics4.py       # Collect sales by day and month
 │   └── statistics5.py       # Collect revenue by day and month
-├── interface
-│   ├── Dockerfile
-│   ├── app.py          # Python script for interface
-│   ├── noelbd.jpg      # image for interface
-│   ├── requierement.txt
 ├──Architecture.jpg
-├── docker-compose.yml       # Docker Compose configuration file
-└── README.md
+├── Instruction.txt
+├── README.md
+└── docker-compose.yml       # Docker Compose configuration file
 ```
 ---
 
@@ -87,8 +87,11 @@ cd projet_kafka
 2) Build Docker images for the producer and consumer: (optionnal if image still available in dockerhub) :
 
 ```bash
-docker build -t kmeddas/producer_api_without_flask ./build_python_producer
-docker build -t kmeddas/consumer_api ./build_python_mongo
+(in each repository)
+docker build -t docker_username/producer_api_without_flask .
+docker build -t docker_username/consumer_api .
+docker build -t docker_username/api_stat .
+docker build -t docker_username//interface_cloud .
 ```
 
 3) Start all services:
@@ -99,15 +102,29 @@ or
 ```bash
 docker-compose up
 ```
-
+4) Stop all services:
+```bash
+docker compose down
+```
+or
+```bash
+docker-compose down
+```
 4) Access the services:
-* Consumer API: http://localhost:5050
-* Interface : http://localhost:8501
+* Check stat: http://localhost:8000/stats   :warning: interface could bug :warning:
+* User interface : http://localhost:8501
 
+You can add kafdrop and mango-express to have an user-friendly interface to check more deeply
 
 ## Useful links
 * https://hub.docker.com/r/kmeddas/consumer_api
 * https://hub.docker.com/r/kmeddas/producer_api_without_flask
 * https://hub.docker.com/r/apache/kafka
 * https://hub.docker.com/_/mongo
+* https://hub.docker.com/r/kmeddas/api_stat
+* https://hub.docker.com/r/kmeddas/interface_cloud
 
+## Contributors
+Addi Amina
+Meddas Kilian
+Sriwelavan Theeban
