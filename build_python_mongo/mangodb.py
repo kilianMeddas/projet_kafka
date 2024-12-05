@@ -1,11 +1,8 @@
-from flask import Flask, jsonify, request
 import pymongo
 from kafka import KafkaConsumer
 import json
 import threading
 import time
-
-app = Flask(__name__)
 
 # Connexion à MongoDB
 try:
