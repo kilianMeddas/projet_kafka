@@ -197,7 +197,6 @@ if st.session_state.page == "intro":
     # Button to navigate to the dashboard
     if st.button("Accéder au Dashboard"):
         st.session_state.page = "dashboard"
-        st.experimental_rerun()
 
 elif st.session_state.page == "dashboard":
     st.title("🎄 Dashboard des Ventes de Noël 🎄")
@@ -347,4 +346,3 @@ elif st.session_state.page == "dashboard":
 
     if st.sidebar.button("⬅️ Retour à l'accueil"):
         st.session_state.page = "intro"
-        st.experimental_rerun()

@@ -36,53 +36,21 @@ def create_consumer():
 consumer = create_consumer()
 
 # Fonction de consommation des messages
-def consume_messages():
+def consume_messages(number_max):
     print("Démarrage de la consommation Kafka...")
+    liste = []
     for message in consumer:
         try:
             print(f"Message reçu : {message.value}")
-            collection.insert_one(message.value)  # Insérer le message dans MongoDB
-            print("Message inséré dans MongoDB avec succès.")
+            liste.append(message.value)
+            if len(liste) >= number_max:
+                collection.insert_many(liste)  # Insérer le message dans MongoDB
+                print(f"{len(liste)} messages inséré dans MongoDB avec succès.")
+                liste = []
         except Exception as e:
             print(f"Erreur lors de l'insertion dans MongoDB : {e}")
 
 # Lancer le consumer Kafka dans un thread séparé
-consumer_thread = threading.Thread(target=consume_messages)
+consumer_thread = threading.Thread(target=consume_messages(5))
 consumer_thread.daemon = True  # Assurez-vous que le thread se termine lorsque l'application s'arrête
 consumer_thread.start()
-
-# Route pour récupérer tous les produits depuis MongoDB
-@app.route('/products', methods=['GET'])
-def get_products():
-    try:
-        products = list(collection.find({}, {"_id": 0}))  # Exclure MongoDB ObjectID
-        return jsonify(products)
-    except Exception as e:
-        return jsonify({"error": f"Erreur lors de la récupération des produits : {e}"}), 500
-
-# Route pour récupérer un produit spécifique par nom
-@app.route('/products/<string:product_name>', methods=['GET'])
-def get_product(product_name):
-    try:
-        product = collection.find_one({"Product": product_name}, {"_id": 0})  # Correction : "name" -> "Product"
-        if product:
-            return jsonify(product)
-        else:
-            return jsonify({"error": "Product not found"}), 404
-    except Exception as e:
-        return jsonify({"error": f"Erreur lors de la récupération du produit : {e}"}), 500
-
-# Route pour ajouter un produit manuellement via l'API
-@app.route('/products', methods=['POST'])
-def add_product():
-    try:
-        new_product = request.json
-        collection.insert_one(new_product)
-        return jsonify({"message": "Product added successfully."}), 201
-    except Exception as e:
-        return jsonify({"error": f"Erreur lors de l'ajout du produit : {e}"}), 500
-
-# Lancer l'application Flask
-if __name__ == '__main__':
-    print('Starting Flask server...')
-    app.run(host='0.0.0.0', port=5050, debug=True)
