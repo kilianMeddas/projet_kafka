@@ -17,7 +17,19 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 3
-
+      
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    networks:
+      - kafka_network
+    ports:
+      - 9000:9000
+    environment:
+      KAFKA_BROKERCONNECT: broker:9092
+    depends_on:
+    - broker
+    
   mongo:
     image: mongo
     container_name: mongo
@@ -36,13 +48,27 @@ services:
       - mongo
       - broker
 
+  tickets:
+    image: amina444/tickets:1.0
+    build: 
+      context: ./build_python_producer/tickets
+    ports: 
+      - "5000:5000"
+    networks: 
+      - kafka_network
+
   producer:
-    image: kmeddas/producer_api_without_flask
+    image: amina444/venv-producer
+    build:
+      context: ./build_python_producer
     container_name: producer
     networks:
       - kafka_network
     depends_on:
-      - broker
+     - broker
+     - tickets
+    ports:
+      - 5001:5001
 
   stats_api:
     image: kmeddas/api_stat
