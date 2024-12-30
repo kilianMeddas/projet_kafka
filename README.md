@@ -16,10 +16,9 @@ This project demonstrates how to integrate Kafka and MongoDB using Docker. The s
 ## Overview
 
 This project comprises:
-1. A Kafka producer generating random tickets and publishing them to a Kafka topic.
-2. A Kafka consumer that consumes messages from Kafka and stores them in MongoDB.
-3. A user-friendly interface to monitor Kafka topics using Kafdrop.
-4. A web interface to view MongoDB data using Mongo-Express.
+1. An API to generating random tickets.
+2. A Kafka producer publishing tickets to a Kafka topic.
+3. A Kafka consumer that consumes messages from Kafka and stores them in MongoDB.
 
 ---
 
@@ -71,8 +70,8 @@ This project comprises:
 * Kafka: As the message broker.
 * MongoDB: For storing consumed messages.
 * Python: For the producer and consumer scripts.
-* Streamlit : For the interface
-* Flask : To check the stat file
+* Streamlit : For the interface.
+* Flask : To check different things.
 
 ---
 ## Setup and Installation
