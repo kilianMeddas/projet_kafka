@@ -4,12 +4,18 @@ from statistics2 import collect_average_revenue
 from statistics3 import collect_revenue_by_product
 from statistics4 import collect_sales_by_day_and_month
 from statistics5 import revenue_day_month
+import requests
 
 app = Flask(__name__)
 
 @app.route("/stats", methods=["GET"])
 def get_all_stats():
     try:
+        response = requests.get("http://producer:5001/sendTickets")
+        if response.status_code != 200:
+            return jsonify({"error": "Failed to generate tickets"}),500
+
+
         revenue = collect_total_revenue()  # Get total revenue
         average = collect_average_revenue()  # Get average revenue
         revenue_by_product = collect_revenue_by_product() # Get revenue by product
