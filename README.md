@@ -34,16 +34,20 @@ This project comprises:
 .
 ├── build_python_mongo
 │   ├── Dockerfile
-│   ├── mangodb.py               # Python script for MongoDB consumer
-│   └── requirement.txt     # Python dependencies
+│   ├── mangodb.py           # Python script for MongoDB consumer
+│   └── requirement.txt      # Python dependencies
 ├── build_python_producer
+│   ├── tickets
+│   │   ├── Dockerfile
+│   │   ├── requirements.txt
+│   │   └── tickets.py
 │   ├── Dockerfile
 │   ├── producer.py          # Python script for Kafka producer
-│   └── requirement.txt     # Python dependencies
+│   └── requirement.txt      # Python dependencies
 ├── interface
 │   ├── Dockerfile
-│   ├── app.py          # Python script for interface
-│   ├── noelbd.jpg      # image for interface
+│   ├── app.py               # Python script for interface
+│   ├── noelbd.jpg           # image for interface
 │   ├── requierement.txt
 ├── stats
 │   ├── Dockerfile
@@ -123,6 +127,8 @@ You can add kafdrop and mango-express to have an user-friendly interface to chec
 * https://hub.docker.com/_/mongo
 * https://hub.docker.com/r/kmeddas/api_stat
 * https://hub.docker.com/r/kmeddas/interface_cloud
+* https://hub.docker.com/repository/docker/amina444/venv-producer
+* https://hub.docker.com/repository/docker/amina444/tickets
 
 ## Contributors
 Addi Amina
