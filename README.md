@@ -117,7 +117,8 @@ docker-compose down
 4) Access the services:
 * Check stat: http://localhost:8000/stats   :warning: interface could bug if you look at this :warning:
 * User interface : http://localhost:8501
-
+* Check status tickets : http://localhost:5001/sendTickets
+* See tickets : http://localhost:5000/tickets
 You can add kafdrop and mango-express to have an user-friendly interface to check more deeply
 
 ## Useful links
