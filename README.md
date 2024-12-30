@@ -132,6 +132,4 @@ You can add kafdrop and mango-express to have an user-friendly interface to chec
 * https://hub.docker.com/repository/docker/amina444/tickets
 
 ## Contributors
-Addi Amina
-Meddas Kilian
-Sriwelavan Theeban
+Addi Amina, Meddas Kilian, Sriwelavan Theeban
